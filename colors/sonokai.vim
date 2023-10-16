@@ -10,7 +10,7 @@
 let s:configuration = sonokai#get_configuration()
 let s:palette = sonokai#get_palette(s:configuration.style, s:configuration.colors_override)
 let s:path = expand('<sfile>:p') " the path of this script
-let s:last_modified = 'Thu Mar 23 11:13:28 UTC 2023'
+let s:last_modified = 'Mon Aug  7 07:21:35 UTC 2023'
 let g:sonokai_loaded_file_types = []
 
 if !(exists('g:colors_name') && g:colors_name ==# 'sonokai' && s:configuration.better_performance)
@@ -49,17 +49,9 @@ else
   endif
   call sonokai#highlight('Terminal', s:palette.fg, s:palette.bg0)
   if s:configuration.show_eob
-    if s:configuration.dim_inactive_windows
-      call sonokai#highlight('EndOfBuffer', s:palette.bg4, s:palette.bg_dim)
-    else
-      call sonokai#highlight('EndOfBuffer', s:palette.bg4, s:palette.bg0)
-    endif
+    call sonokai#highlight('EndOfBuffer', s:palette.bg4, s:palette.none)
   else
-    if s:configuration.dim_inactive_windows
-      call sonokai#highlight('EndOfBuffer', s:palette.bg_dim, s:palette.bg_dim)
-    else
-      call sonokai#highlight('EndOfBuffer', s:palette.bg0, s:palette.bg0)
-    endif
+    call sonokai#highlight('EndOfBuffer', s:palette.bg0, s:palette.none)
   endif
   call sonokai#highlight('Folded', s:palette.grey, s:palette.bg1)
   call sonokai#highlight('ToolbarLine', s:palette.fg, s:palette.bg2)
@@ -119,8 +111,13 @@ call sonokai#highlight('PmenuKind', s:palette.green, s:palette.bg2)
 call sonokai#highlight('PmenuExtra', s:palette.grey, s:palette.bg2)
 highlight! link WildMenu PmenuSel
 call sonokai#highlight('PmenuThumb', s:palette.none, s:palette.grey)
-call sonokai#highlight('NormalFloat', s:palette.fg, s:palette.bg2)
-call sonokai#highlight('FloatBorder', s:palette.grey, s:palette.bg2)
+if s:configuration.float_style ==# 'dim'
+  call sonokai#highlight('NormalFloat', s:palette.fg, s:palette.bg_dim)
+  call sonokai#highlight('FloatBorder', s:palette.grey, s:palette.bg_dim)
+else
+  call sonokai#highlight('NormalFloat', s:palette.fg, s:palette.bg2)
+  call sonokai#highlight('FloatBorder', s:palette.grey, s:palette.bg2)
+endif
 call sonokai#highlight('Question', s:palette.yellow, s:palette.none)
 if s:configuration.spell_foreground ==# 'none'
   call sonokai#highlight('SpellBad', s:palette.none, s:palette.none, 'undercurl', s:palette.red)
@@ -325,16 +322,21 @@ if s:configuration.diagnostic_virtual_text ==# 'grey'
   highlight! link VirtualTextError Grey
   highlight! link VirtualTextInfo Grey
   highlight! link VirtualTextHint Grey
-else
+elseif s:configuration.diagnostic_virtual_text ==# 'colored'
   highlight! link VirtualTextWarning Yellow
   highlight! link VirtualTextError Red
   highlight! link VirtualTextInfo Blue
   highlight! link VirtualTextHint Green
+else
+  call sonokai#highlight('VirtualTextWarning', s:palette.yellow, s:palette.diff_yellow)
+  call sonokai#highlight('VirtualTextError', s:palette.red, s:palette.diff_red)
+  call sonokai#highlight('VirtualTextInfo', s:palette.blue, s:palette.diff_blue)
+  call sonokai#highlight('VirtualTextHint', s:palette.green, s:palette.diff_green)
 endif
-call sonokai#highlight('ErrorFloat', s:palette.red, s:palette.bg2)
-call sonokai#highlight('WarningFloat', s:palette.yellow, s:palette.bg2)
-call sonokai#highlight('InfoFloat', s:palette.blue, s:palette.bg2)
-call sonokai#highlight('HintFloat', s:palette.green, s:palette.bg2)
+call sonokai#highlight('ErrorFloat', s:palette.red, s:palette.none)
+call sonokai#highlight('WarningFloat', s:palette.yellow, s:palette.none)
+call sonokai#highlight('InfoFloat', s:palette.blue, s:palette.none)
+call sonokai#highlight('HintFloat', s:palette.green, s:palette.none)
 if &diff
   call sonokai#highlight('CurrentWord', s:palette.bg0, s:palette.green)
 elseif s:configuration.current_word ==# 'grey background'
@@ -567,6 +569,8 @@ if has('nvim-0.8.0')
   highlight! link @text.strong TSStrong
   highlight! link @text.title TSTitle
   highlight! link @text.todo TSTodo
+  highlight! link @text.todo.checked Green
+  highlight! link @text.todo.unchecked Ignore
   highlight! link @text.underline TSUnderline
   highlight! link @text.uri TSURI
   highlight! link @text.warning TSWarning
@@ -579,6 +583,34 @@ if has('nvim-0.8.0')
   highlight! link @variable TSVariable
   highlight! link @variable.builtin TSVariableBuiltin
 endif
+if has('nvim-0.9.0')
+  highlight! link @lsp.type.class TSType
+  highlight! link @lsp.type.comment TSComment
+  highlight! link @lsp.type.decorator TSFunction
+  highlight! link @lsp.type.enum TSType
+  highlight! link @lsp.type.enumMember TSProperty
+  highlight! link @lsp.type.events TSLabel
+  highlight! link @lsp.type.function TSFunction
+  highlight! link @lsp.type.interface TSType
+  highlight! link @lsp.type.keyword TSKeyword
+  highlight! link @lsp.type.macro TSConstMacro
+  highlight! link @lsp.type.method TSMethod
+  highlight! link @lsp.type.modifier TSTypeQualifier
+  highlight! link @lsp.type.namespace TSNamespace
+  highlight! link @lsp.type.number TSNumber
+  highlight! link @lsp.type.operator TSOperator
+  highlight! link @lsp.type.parameter TSParameter
+  highlight! link @lsp.type.property TSProperty
+  highlight! link @lsp.type.regexp TSStringRegex
+  highlight! link @lsp.type.string TSString
+  highlight! link @lsp.type.struct TSType
+  highlight! link @lsp.type.type TSType
+  highlight! link @lsp.type.typeParameter TSTypeDefinition
+  highlight! link @lsp.type.variable TSVariable
+  highlight! link DiagnosticUnnecessary WarningText
+endif
+highlight! link TSModuleInfoGood Green
+highlight! link TSModuleInfoBad Red
 " }}}
 " github/copilot.vim {{{
 highlight! link CopilotSuggestion Grey
@@ -612,6 +644,7 @@ highlight! link CocErrorFloat ErrorFloat
 highlight! link CocWarningFloat WarningFloat
 highlight! link CocInfoFloat InfoFloat
 highlight! link CocHintFloat HintFloat
+highlight! link CocFloating NormalFloat
 highlight! link CocFloatDividingLine Grey
 highlight! link CocErrorHighlight ErrorText
 highlight! link CocWarningHighlight WarningText
@@ -1424,6 +1457,7 @@ if !s:configuration.transparent_background
   call sonokai#highlight('NeoTreeEndOfBuffer', s:palette.bg_dim, s:palette.bg_dim)
   call sonokai#highlight('NeoTreeVertSplit', s:palette.bg0, s:palette.bg0)
 endif
+highlight! link NeoTreeDirectoryIcon Blue
 highlight! link NeoTreeGitAdded Green
 highlight! link NeoTreeGitConflict Yellow
 highlight! link NeoTreeGitDeleted Red
@@ -1667,6 +1701,12 @@ highlight! link htmlArg Blue
 highlight! link htmlScriptTag Purple
 highlight! link htmlSpecialTagName RedItalic
 highlight! link htmlString Green
+" }}}
+" nvim-treesitter/nvim-treesitter {{{
+highlight! link htmlTSText TSNone
+if has('nvim-0.8.0')
+  highlight! link @text.html htmlTSText
+endif
 " }}}
 " syn_end }}}
 " syn_begin: htmldjango {{{
@@ -1937,6 +1977,12 @@ highlight! link jsxClosePunct Blue
 highlight! link jsxEscapeJs Purple
 highlight! link jsxAttrib Blue
 " }}}
+" nvim-treesitter/nvim-treesitter {{{
+if has('nvim-0.9.0')
+  highlight! link @lsp.typemod.variable.defaultLibrary.javascript TSConstBuiltin
+  highlight! link @lsp.typemod.variable.defaultLibrary.javascriptreact TSConstBuiltin
+endif
+" }}}
 " syn_end }}}
 " syn_begin: typescript/typescriptreact {{{
 " vim-typescript: https://github.com/leafgarland/typescript-vim{{{
@@ -2093,6 +2139,18 @@ highlight! link typescriptDOMFormProp Fg
 highlight! link typescriptBOMHistoryProp Fg
 highlight! link typescriptMathStaticProp Fg
 " }}}
+" nvim-treesitter/nvim-treesitter {{{
+highlight! link tsxTSTag OrangeItalic
+highlight! link tsxTSConstructor TSType
+if has('nvim-0.8.0')
+  highlight! link @tag.tsx tsxTSTag
+  highlight! link @constructor.tsx tsxTSConstructor
+endif
+if has('nvim-0.9.0')
+  highlight! link @lsp.typemod.variable.defaultLibrary.typescript TSConstBuiltin
+  highlight! link @lsp.typemod.variable.defaultLibrary.typescriptreact TSConstBuiltin
+endif
+" }}}
 " syn_end }}}
 " syn_begin: dart {{{
 " dart-lang: https://github.com/dart-lang/dart-vim-plugin{{{
@@ -2208,7 +2266,7 @@ highlight! link luaFunction Red
 highlight! link luaTable Fg
 highlight! link luaIn Red
 " }}}
-" vim-lua: https://github.com/tbastos/vim-lua{{{
+" vim-lua: https://github.com/tbastos/vim-lua {{{
 highlight! link luaFuncCall Green
 highlight! link luaLocal Red
 highlight! link luaSpecialValue Green
@@ -2220,6 +2278,12 @@ highlight! link luaFuncTable BlueItalic
 highlight! link luaFuncArgName Fg
 highlight! link luaEllipsis Red
 highlight! link luaDocTag Green
+" }}}
+" nvim-treesitter/nvim-treesitter {{{
+highlight! link luaTSConstructor luaBraces
+if has('nvim-0.8.0')
+  highlight! link @constructor.lua luaTSConstructor
+endif
 " }}}
 " syn_end }}}
 " syn_begin: java {{{
@@ -2655,6 +2719,7 @@ highlight! link tomlString Green
 highlight! link tomlTableArray tomlTable
 " syn_end }}}
 " syn_begin: gitcommit {{{
+" builtin {{{
 highlight! link gitcommitSummary Red
 highlight! link gitcommitUntracked Grey
 highlight! link gitcommitDiscarded Grey
@@ -2663,6 +2728,12 @@ highlight! link gitcommitUnmerged Grey
 highlight! link gitcommitOnBranch Grey
 highlight! link gitcommitArrow Grey
 highlight! link gitcommitFile Green
+" }}}
+" nvim-treesitter/nvim-treesitter {{{
+if has('nvim-0.8.0')
+  highlight! link @text.gitcommit TSNone
+endif
+" }}}
 " syn_end }}}
 " syn_begin: dosini {{{
 call sonokai#highlight('dosiniHeader', s:palette.red, s:palette.none, 'bold')

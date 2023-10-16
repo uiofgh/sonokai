@@ -201,7 +201,7 @@ E.g.
     let g:sonokai_better_performance = 1
 
     colorscheme sonokai
-    let g:lightline.colorscheme = 'sonokai'
+    let g:lightline = {'colorscheme' : 'sonokai'}
 <
 ------------------------------------------------------------------------------
                                                                *g:sonokai_style*
@@ -266,7 +266,12 @@ background), set this option to `2`.
                                                 *g:sonokai_dim_inactive_windows*
 g:sonokai_dim_inactive_windows~
 
-Dim inactive windows. Only works in neovim currently.
+Dim inactive windows. Only works in Neovim currently.
+
+When this option is used in conjunction with |g:sonokai_show_eob| set to 0,
+the end of the buffer will only be hidden inside the active window. Inside
+inactive windows, the end of buffer filler characters will be visible in
+dimmed symbols. This is due to the way Vim and Neovim handle |hl-EndOfBuffer|.
 
     Type:               |Number|
     Available values:   `0`, `1`
@@ -303,6 +308,22 @@ Whether to show |hl-EndOfBuffer|.
     Type:               |Number|
     Available values:   `1`, `0`
     Default value:      `1`
+
+------------------------------------------------------------------------------
+                                                         *g:sonokai_float_style*
+g:sonokai_float_style~
+
+Style used to make floating windows stand out from other windows. `'bright'`
+makes the background of these windows lighter than |hl-Normal|, whereas
+`'dim'` makes it darker.
+
+Floating windows include for instance diagnostic pop-ups, scrollable
+documentation windows from completion engines, overlay windows from
+installers, etc.
+
+    Type:               |String|
+    Available values:   `'bright'`, `'dim'`
+    Default value:      `'bright'`
 
 ------------------------------------------------------------------------------
                                            *g:sonokai_diagnostic_text_highlight*
@@ -349,17 +370,17 @@ Currently, the following plugins are supported:
                                              *g:sonokai_diagnostic_virtual_text*
 g:sonokai_diagnostic_virtual_text~
 
-Some plugins can use virtual text feature of neovim to display
-error/warning/info/hint information, you can use this option to adjust the
-colors of it.
+Some plugins can use the virtual text feature of Neovim to display
+error/warning/info/hint information. You can use this option to adjust the
+way these virtual texts are highlighted.
 
     Type:               |String|
-    Available values:   `'grey'`, `'colored'`
+    Available values:   `'grey'`, `'colored'`, `'highlighted'`
     Default value:      `'grey'`
 
 Currently, the following plugins are supported:
 
-- neovim's built-in language server client
+- Neovim's built-in language server client
 - https://github.com/neoclide/coc.nvim
 - https://github.com/prabirshrestha/vim-lsp
 - https://github.com/dense-analysis/ale
